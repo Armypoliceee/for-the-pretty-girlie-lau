@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Hey Pretty — for your bestie ✨</title>
+  <style>
+    :root{
+      --pink-1:#ffe6f0;
+      --pink-2:#ff9ccf;
+      --accent:#ff2d95;
+      --soft:#fff7fb;
+      --text:#4a1033;
+      --glass: rgba(255,255,255,0.35);
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      display:grid;
+      place-items:center;
+      background: radial-gradient(1200px 600px at 10% 10%, #fff0f7 0%, transparent 12%),
+                  radial-gradient(900px 500px at 90% 90%, #fff7ff 0%, transparent 12%),
+                  linear-gradient(135deg,var(--pink-1),var(--pink-2));
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:32px;
+    }
+
+    .card{
+      width:min(820px,95vw);
+      background:linear-gradient(180deg, rgba(255,255,255,0.7), rgba(255,255,255,0.5));
+      border-radius:20px;
+      padding:28px;
+      box-shadow:0 10px 40px rgba(170,20,80,0.16);
+      backdrop-filter: blur(8px) saturate(1.05);
+      position:relative;
+      overflow:hidden;
+    }
+
+    header{
+      display:flex;
+      gap:20px;
+      align-items:center;
+    }
+
+    .avatar{
+      width:110px;height:110px;border-radius:18px;flex:0 0 110px;
+      background:linear-gradient(135deg,var(--soft),#ffeef8);
+      display:grid;place-items:center;font-weight:700;font-size:30px;color:var(--accent);
+      border:4px solid rgba(255,255,255,0.6);
+    }
+
+    h1{
+      margin:0;font-size:34px;line-height:1.02;color:#3a0630;
+    }
+    p.lead{margin:6px 0 0;color:#5d2a46}
+
+    .big-claim{
+      font-size:56px;font-weight:800;margin:26px 0 6px;letter-spacing:-1px;color:var(--accent);
+      text-shadow:0 6px 24px rgba(255,45,149,0.14);
+    }
+
+    .sub{
+      color:#6b2d4a;margin-bottom:18px;font-weight:600
+    }
+
+    .controls{display:flex;gap:12px;flex-wrap:wrap}
+    .btn{
+      border:0;padding:12px 16px;border-radius:12px;font-weight:700;cursor:pointer;
+      box-shadow:0 6px 18px rgba(120,0,60,0.08);
+    }
+    .btn-pink{background:linear-gradient(90deg,var(--accent),#ff6fb3);color:white}
+    .btn-soft{background:transparent;border:2px solid rgba(255,255,255,0.5);color:#3a0630}
+
+    .compliment-box{
+      margin-top:18px;padding:18px;border-radius:14px;background:rgba(255,255,255,0.6);
+      min-height:70px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;color:#4a0b2b
+    }
+
+    .hearts{position:absolute;right:-40px;top:-40px;pointer-events:none}
+
+    /* small footer */
+    footer{display:flex;justify-content:space-between;align-items:center;margin-top:18px;color:#6b2d4a;font-size:13px}
+
+    /* confetti canvas covers card */
+    #confetti{position:absolute;inset:0;pointer-events:none}
+
+    /* typing cursor */
+    .type{display:inline-block}
+    .cursor{display:inline-block;width:6px;height:18px;background:var(--accent);vertical-align:middle;margin-left:6px;border-radius:2px;opacity:1;animation:blink 1s linear infinite}
+    @keyframes blink{50%{opacity:0}}
+
+    @media (max-width:520px){
+      .big-claim{font-size:40px}
+      .avatar{width:86px;height:86px}
+    }
+  </style>
+</head>
+<body>
+  <div class="card" role="main" aria-labelledby="title">
+    <canvas id="confetti" aria-hidden="true"></canvas>
+    <div class="hearts" aria-hidden="true">
+      <!-- decorative hearts (SVG) -->
+      <svg width="220" height="220" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <g opacity="0.12">
+          <path d="M50 82s-18-11-28-20C8 53 10 32 27 26c10-4 19 3 23 8 4-5 13-12 23-8 17 6 19 27 5 36-10 9-28 20-28 20z" fill="#ff2d95"/>
+        </g>
+      </svg>
+    </div>
+
+    <header>
+      <div class="avatar" id="avatar">L</div>
+      <div>
+        <h1 id="title">Hey, <span id="friendName">Lau</span> 💕</h1>
+        <p class="lead">We made you a tiny website to tell you something very important.</p>
+      </div>
+    </header>
+
+    <div class="big-claim" id="bigClaim">You're pretty.</div>
+    <div class="sub">(Yes. Really. We aren't joking — press the button to prove it.)</div>
+
+    <div class="controls" role="region" aria-label="Controls">
+      <button class="btn btn-pink" id="revealBtn">Show me why ✨</button>
+      <button class="btn btn-soft" id="surpriseBtn">Random surprise</button>
+      <button class="btn btn-soft" id="shareBtn">Copy sweet message</button>
+    </div>
+
+    <div class="compliment-box" id="complimentBox" aria-live="polite">Press "Show me why" — we packed 50 cute reasons.</div>
+
+    <footer>
+      <div>Made with 💖 by your best friend</div>
+      <div><small>Share the love — screenshot & send!</small></div>
+    </footer>
+  </div>
+
+  <script>
+    // --- data ---
+    const compliments = [
+      "You're Pretty, Jusst accept the fact"
+    ];
+
+    // --- helpers ---
+    const el = id => document.getElementById(id);
+    function randomFrom(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+    // reveal logic
+    el('revealBtn').addEventListener('click', ()=>{
+      const text = randomFrom(compliments);
+      revealCompliment(text);
+      burstConfetti();
+    });
+
+    el('surpriseBtn').addEventListener('click', ()=>{
+      const long = compliments.slice().sort(()=>0.5-Math.random()).slice(0,4).join(' ');
+      revealCompliment(long);
+      heartPulse();
+    });
+
+    el('shareBtn').addEventListener('click', async ()=>{
+      const message = `Hey ${el('friendName').textContent}! You're pretty — and someone made you this tiny website to prove it 💖`;
+      try{
+        await navigator.clipboard.writeText(message);
+        el('complimentBox').textContent = 'Sweet message copied to clipboard — send it!';
+      }catch(e){
+        el('complimentBox').textContent = 'Could not copy automatically — select and copy this text:'; 
+        const area = document.createElement('textarea'); area.value = message; area.style.width='100%'; area.style.marginTop='10px';
+        el('complimentBox').innerHTML=''; el('complimentBox').appendChild(area);
+      }
+    });
+
+    function revealCompliment(txt){
+      // typing effect
+      const box = el('complimentBox');
+      box.textContent = '';
+      const span = document.createElement('span'); span.className='type'; box.appendChild(span);
+      const cursor = document.createElement('span'); cursor.className='cursor'; box.appendChild(cursor);
+      let i=0; const speed=18;
+      (function type(){
+        if(i<=txt.length){ span.textContent = txt.slice(0,i); i++; setTimeout(type, speed);} else {cursor.style.display='none'}
+      })();
+    }
+
+    // avatar initial letter from prompt (you can change it)
+    function setAvatar(name){ if(!name) return; el('friendName').textContent = name; el('avatar').textContent = name.trim()[0].toUpperCase(); }
+    setAvatar('Lau'); // changed to your friend's name
+
+    // simple heart pulse for the svg hearts
+    function heartPulse(){ const h = document.querySelector('.hearts'); h.animate([{transform:'scale(0.96)'},{transform:'scale(1.02)'},{transform:'scale(0.98)'}],{duration:700,iterations:2}); }
+
+    // --- confetti ---
+    const canvas = el('confetti'); const ctx = canvas.getContext('2d');
+    let W,H,particles=[];
+    function resize(){ W=canvas.width=canvas.clientWidth; H=canvas.height=canvas.clientHeight }
+    window.addEventListener('resize', resize); resize();
+
+    function createParticle(x,y){
+      return {
+        x, y,
+        vx: (Math.random()-0.5)*6,
+        vy: - (2 + Math.random()*6),
+        life: 60 + Math.random()*40,
+        size: 6 + Math.random()*8,
+        hue: Math.floor(320 + Math.random()*40)
+      }
+    }
+
+    function burstConfetti(){
+      const cx = W/2; const cy = H/3;
+      for(let i=0;i<45;i++) particles.push(createParticle(cx + (Math.random()-0.5)*160, cy + (Math.random()-0.5)*60));
+      if(!animating){animating=true; requestAnimationFrame(loop)}
+    }
+
+    let animating=false;
+    function loop(){
+      ctx.clearRect(0,0,W,H);
+      for(let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life -= 1;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate((p.vx+p.vy)/20);
+        ctx.fillStyle = `hsl(${p.hue} 100% 65%)`;
+        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size);
+        ctx.restore();
+        if(p.life<=0 || p.y>H+50) particles.splice(i,1);
+      }
+      if(particles.length>0) requestAnimationFrame(loop); else animating=false;
+    }
+
+    // little accessibility: keyboard activate main buttons
+    ['revealBtn','surpriseBtn','shareBtn'].forEach(id=>{
+      const b=el(id); b.addEventListener('keyup', (e)=>{ if(e.key==='Enter' || e.key===' ') b.click(); })
+    });
+
+    // autoplay a tiny reveal on first load
+    setTimeout(()=>{ const t=randomFrom(compliments); revealCompliment(t); },1200);
+  </script>
+</body>
+</html>
